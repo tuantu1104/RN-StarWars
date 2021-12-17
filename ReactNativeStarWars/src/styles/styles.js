@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#111',
-    padding: 10
+    paddingHorizontal: 10
   },
   center: {
     position: 'absolute',
@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     bottom: 0
   },
   error: {
+    textAlign: 'center',
     fontSize: 20,
     color: 'red'
   },
@@ -29,18 +30,22 @@ export const styles = StyleSheet.create({
   header: { 
     marginTop: 15, 
     marginBottom: 8,
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '600'
   },
   title: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '600'
   },
   date: {
-    fontSize: 14,
+    fontSize: 12,
   },
   scroll: {
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 5
+  },
+  seeMoreLess: {
+    color: 'yellow',
+    fontSize: 16
   }
 });

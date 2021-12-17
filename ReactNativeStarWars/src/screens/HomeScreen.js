@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { 
+  useEffect, 
+  useState, 
+  useLayoutEffect,
+  useContext
+} from 'react';
 import {
   View,
   Text,
@@ -11,18 +16,24 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import { GET_ALL_FILMS } from '../service/graphql';
 import { styles } from '../styles/styles';
+import MovieCell from '../components/MovieCell';
+import CharacterCell from '../components/CharacterCell';
+import { Context } from '../service/Context';
 
 const SORT = {
   ASC: 'ASC',
   DESC: 'DESC',
 }
 
+const EPISODE_HEADER = 'Star Wars Movies';
+const LIKED_CHARACTERS_HEADER = 'Liked Characters';
+
 function HomeScreen({ route, navigation }) {
   const isEpisode = route.params.isEpisode;
   const { loading, error, data } = useQuery(GET_ALL_FILMS);
   const [sortedMovies, setSortedMovies] = useState([]);
   const [sort, setSort] = useState(null);
-  const [likedCharacters, setLikedCharacters] = useState([]);
+  const { likedCharacters } = useContext(Context);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -39,6 +50,9 @@ function HomeScreen({ route, navigation }) {
     });
   });
 
+  // useEffect(() => {
+  //   console.log(likedCharacters);
+  // }, [likedCharacters])
 
   useEffect(() => {
     if (data) {
@@ -58,26 +72,54 @@ function HomeScreen({ route, navigation }) {
     setSortedMovies(movies);
   }
 
-  if (isEpisode && loading) return <View style={styles.container}><ActivityIndicator style={styles.center}></ActivityIndicator></View> ;
-  if (error) return <View style={styles.container}><Text style={styles.error}>Error</Text></View>;
+  if (isEpisode && loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator style={styles.center}></ActivityIndicator>
+      </View>
+    )
+  }
+  if (error) {
+    console.log(error);
+    return (
+      <View style={styles.container}><Text style={styles.error}>Error</Text></View>
+    )
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, styles.header]}>{isEpisode ? 'Movies' : 'Liked Characters'}</Text>
-      <FlatList
-        keyExtractor={(item, index) => index.toString()}
-        data={isEpisode ? sortedMovies : likedCharacters}
-        renderItem={({ item }) => {
-          const truncatedScroll = item.openingCrawl.substring(0, 49);
-          return (
-            <TouchableOpacity style={styles.cell}>
-              <Text style={[styles.text, styles.title]}>{item.title}</Text>
-              <Text style={[styles.text, styles.date]}>{`(${item.releaseDate})`}</Text>
-              <Text style={[styles.text, styles.scroll]}>{truncatedScroll}</Text>
-            </TouchableOpacity>
-          )
-        }}
-      />
+      <Text style={[styles.text, styles.header]}>{isEpisode ? EPISODE_HEADER : LIKED_CHARACTERS_HEADER}</Text>
+      { isEpisode && (
+        <FlatList
+          keyExtractor={(item, index) => index.toString()}
+          data={sortedMovies}
+          renderItem={({ item }) => {
+            return (
+              <MovieCell 
+                movie={item}
+                truncated={true}
+                onPress={() => navigation.navigate('Movie', { movieId: item.id })}
+              />
+            )
+          }}
+        />
+      )}
+      { !isEpisode && (
+        <FlatList
+          keyExtractor={(item, index) => index.toString()}
+          data={likedCharacters}
+          ListEmptyComponent={<Text style={[styles.text, styles.title]}>No Liked Character</Text>}
+          renderItem={({ item }) => {
+            return (
+              <CharacterCell
+                key={item.id}
+                name={item.name}
+                onPress={() => navigation.navigate('Character', { characterId: item.id })}
+              />
+            )
+          }}
+        />
+      )}
     </View>
   );
 }

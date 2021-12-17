@@ -27,6 +27,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import HomeScreen from './src/screens/HomeScreen';
 import MovieScreen from './src/screens/MovieScreen';
 import CharacterScreen from './src/screens/CharacterScreen';
+import Provider from './src/service/Context';
 
 LogBox.ignoreAllLogs();
 
@@ -43,23 +44,34 @@ const headerOptions = {
   headerTintColor: 'yellow'
 };
 
-const EpisodeStack = () => {
-  return (
-    <Stack.Navigator screenOptions={headerOptions}>
-      <Stack.Screen name="Home" component={HomeScreen} initialParams={{ isEpisode: true }} />
-      <Stack.Screen name="Movie" component={MovieScreen} />
-      <Stack.Screen name="Character" component={CharacterScreen} />
-    </Stack.Navigator>
-  )
+const bottomTabOptions = { 
+  headerShown: false,
+  tabBarStyle: {
+    backgroundColor: '#333'
+  },
+  tabBarActiveTintColor: 'yellow',
+  tabBarInactiveTintColor: 'gray',
 }
 
-const LikedCharacterStack = () => {
+const HomeTabs = () => {
   return (
-    <Stack.Navigator screenOptions={headerOptions}>
-      <Stack.Screen name="Home" component={HomeScreen} initialParams={{ isEpisode: false }} />
-      <Stack.Screen name="Movie" component={MovieScreen} />
-      <Stack.Screen name="Character" component={CharacterScreen} />
-    </Stack.Navigator>
+    <Tab.Navigator screenOptions={bottomTabOptions}>
+      <Tab.Screen 
+        name="Episode" 
+        component={HomeScreen}
+        initialParams={{ isEpisode: true }}
+        options={{ tabBarIcon: ({ color, size }) => <FontAwesome5 name={"film"} size={size} color={color} /> }}
+      />
+      <Tab.Screen 
+        name="LikedCharacter" 
+        component={HomeScreen} 
+        initialParams={{ isEpisode: false }}
+        options={{ 
+          tabBarLabel: 'Liked Characters',
+          tabBarIcon: ({ color, size }) => <FontAwesome5 name={"user-friends"} size={size} color={color} />
+        }} 
+      />
+    </Tab.Navigator>
   )
 }
 
@@ -75,32 +87,13 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <NavigationContainer>
-        <Tab.Navigator 
-          screenOptions={{ 
-            headerShown: false,
-            tabBarStyle: {
-              backgroundColor: '#333'
-            },
-            tabBarActiveTintColor: 'yellow',
-            tabBarInactiveTintColor: 'gray',
-          }}
-        >
-          <Tab.Screen 
-            name="Episode" 
-            component={EpisodeStack} 
-            options={{ 
-              tabBarIcon: ({ color, size }) => <FontAwesome5 name={"film"} size={size} color={color} />,
-            }} 
-          />
-          <Tab.Screen 
-            name="LikedCharacter" 
-            component={LikedCharacterStack} 
-            options={{ 
-              tabBarLabel: 'Liked Characters',
-              tabBarIcon: ({ color, size }) => <FontAwesome5 name={"user-friends"} size={size} color={color} />
-            }} 
-          />
-        </Tab.Navigator>
+        <Provider>
+          <Stack.Navigator screenOptions={headerOptions}>
+            <Stack.Screen name="Home" component={HomeTabs} />
+            <Stack.Screen name="Movie" component={MovieScreen} />
+            <Stack.Screen name="Character" component={CharacterScreen} />
+          </Stack.Navigator>
+        </Provider>
       </NavigationContainer>
     </ApolloProvider>
   );
