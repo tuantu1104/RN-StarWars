@@ -8,9 +8,7 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   StatusBar,
   LogBox
 } from 'react-native';
